@@ -89,7 +89,7 @@ public class PlayerController : MonoBehaviour
         const int panelHeight = 76;
         GUI.Box(new Rect(16f, 16f, panelWidth, panelHeight), "BALL CONTROL");
         GUI.Label(new Rect(30f, 39f, panelWidth - 28f, 20f),
-            "Active: Player " + (playerOneActive ? "1 (WASD)" : "2 (Arrow Keys)"));
+            "Active: Player " + (playerOneActive ? "1 (WASD)" : "2 (WASD)"));
 
         string nextPlayer = playerOneActive ? "Player 2" : "Player 1";
         if (GUI.Button(new Rect(30f, 59f, panelWidth - 28f, 26f), "Switch to " + nextPlayer + "  [Tab]"))

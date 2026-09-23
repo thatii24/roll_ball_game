@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-/// <summary>Player 2's independently assigned arrow-key ball controls.</summary>
+/// <summary>Player 2's WASD controls, active while Player 2 is selected.</summary>
 public class Player2Controller : MonoBehaviour
 {
     [SerializeField, Min(0f)] private float acceleration = 24f;
@@ -42,10 +42,10 @@ public class Player2Controller : MonoBehaviour
             return;
 
         Vector2 input = Vector2.zero;
-        if (Keyboard.current.akey.isPressed) input.x -= 1f;
-        if (Keyboard.current.dkey.isPressed) input.x += 1f;
-        if (Keyboard.current.skey.isPressed) input.y -= 1f;
-        if (Keyboard.current.wkey.isPressed) input.y += 1f;
+        if (Keyboard.current.aKey.isPressed) input.x -= 1f;
+        if (Keyboard.current.dKey.isPressed) input.x += 1f;
+        if (Keyboard.current.sKey.isPressed) input.y -= 1f;
+        if (Keyboard.current.wKey.isPressed) input.y += 1f;
 
         Vector3 direction = new Vector3(input.x, 0f, input.y).normalized;
         body.AddForce(direction * acceleration, ForceMode.Acceleration);
