@@ -1,46 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+/// <summary>Player 2's independently assigned arrow-key ball controls.</summary>
+public class Player2Controller : MonoBehaviour
 {
- // Rigidbody of the player.
- private Rigidbody rb; 
+    [SerializeField, Min(0f)] private float acceleration = 24f;
+    [SerializeField, Min(0f)] private float maxSpeed = 8.5f;
+    [SerializeField, Min(0f)] private float rollingDrag = 1.25f;
 
- // Movement along X and Y axes.
- private float movementX;
- private float movementY;
+    private Rigidbody body;
 
- // Speed at which the player moves.
- public float speed = 0; 
-
- // Start is called before the first frame update.
- void Start()
+    private void Awake()
     {
- // Get and store the Rigidbody component attached to the player.
-        rb = GetComponent<Rigidbody>();
-    }
- 
- // This function is called when a move input is detected.
- void OnMove(InputValue movementValue)
-    {
- // Convert the input value into a Vector2 for movement.
-        Vector2 movementVector = movementValue.Get<Vector2>();
+        body = GetComponent<Rigidbody>();
+        if (body == null)
+            return;
 
- // Store the X and Y components of the movement.
-        movementX = movementVector.x; 
-        movementY = movementVector.y; 
+        body.interpolation = RigidbodyInterpolation.Interpolate;
+        body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        body.linearDamping = rollingDrag;
     }
 
- // FixedUpdate is called once per fixed frame-rate frame.
- void FixedUpdate() 
+    private void FixedUpdate()
     {
- // Create a 3D movement vector using the X and Y inputs.
-        Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
+        if (PlayerController.PlayerOneActive || body == null || Keyboard.current == null)
+            return;
 
- // Apply force to the Rigidbody to move the player.
-        rb.AddForce(movement * speed); 
+        Vector2 input = Vector2.zero;
+        if (Keyboard.current.leftArrowKey.isPressed) input.x -= 1f;
+        if (Keyboard.current.rightArrowKey.isPressed) input.x += 1f;
+        if (Keyboard.current.downArrowKey.isPressed) input.y -= 1f;
+        if (Keyboard.current.upArrowKey.isPressed) input.y += 1f;
+
+        Vector3 direction = new Vector3(input.x, 0f, input.y).normalized;
+        body.AddForce(direction * acceleration, ForceMode.Acceleration);
+
+        Vector3 horizontalVelocity = new Vector3(body.linearVelocity.x, 0f, body.linearVelocity.z);
+        if (horizontalVelocity.sqrMagnitude > maxSpeed * maxSpeed)
+        {
+            horizontalVelocity = horizontalVelocity.normalized * maxSpeed;
+            body.linearVelocity = new Vector3(horizontalVelocity.x, body.linearVelocity.y, horizontalVelocity.z);
+        }
     }
 }

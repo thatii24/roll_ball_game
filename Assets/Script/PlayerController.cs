@@ -1,46 +1,89 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>Player 1's ball controller and the shared player-selection UI.</summary>
 public class PlayerController : MonoBehaviour
 {
- // Rigidbody of the player.
- private Rigidbody rb; 
+    [SerializeField, Min(0f)] private float acceleration = 24f;
+    [SerializeField, Min(0f)] private float maxSpeed = 8.5f;
+    [SerializeField, Min(0f)] private float rollingDrag = 1.25f;
 
- // Movement along X and Y axes.
- private float movementX;
- private float movementY;
+    private Rigidbody body;
+    private bool hasSecondPlayer;
+    private static bool playerOneActive = true;
 
- // Speed at which the player moves.
- public float speed = 0; 
+    public static bool PlayerOneActive => playerOneActive;
 
- // Start is called before the first frame update.
- void Start()
+    private void Awake()
     {
- // Get and store the Rigidbody component attached to the player.
-        rb = GetComponent<Rigidbody>();
-    }
- 
- // This function is called when a move input is detected.
- void OnMove(InputValue movementValue)
-    {
- // Convert the input value into a Vector2 for movement.
-        Vector2 movementVector = movementValue.Get<Vector2>();
-
- // Store the X and Y components of the movement.
-        movementX = movementVector.x; 
-        movementY = movementVector.y; 
+        body = GetComponent<Rigidbody>();
+        playerOneActive = true;
+        hasSecondPlayer = GameObject.Find("Player2") != null;
+        ConfigureBody();
     }
 
- // FixedUpdate is called once per fixed frame-rate frame.
- void FixedUpdate() 
+    private void Update()
     {
- // Create a 3D movement vector using the X and Y inputs.
-        Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
+        if (hasSecondPlayer && Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
+            SetActivePlayer(!playerOneActive);
+    }
 
- // Apply force to the Rigidbody to move the player.
-        rb.AddForce(movement * speed); 
+    private void ConfigureBody()
+    {
+        if (body == null)
+            return;
+
+        body.interpolation = RigidbodyInterpolation.Interpolate;
+        body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        body.linearDamping = rollingDrag;
+    }
+
+    private void FixedUpdate()
+    {
+        if (!playerOneActive || body == null || Keyboard.current == null)
+            return;
+
+        Vector2 input = Vector2.zero;
+        if (Keyboard.current.aKey.isPressed) input.x -= 1f;
+        if (Keyboard.current.dKey.isPressed) input.x += 1f;
+        if (Keyboard.current.sKey.isPressed) input.y -= 1f;
+        if (Keyboard.current.wKey.isPressed) input.y += 1f;
+
+        ApplyRollingInput(input);
+    }
+
+    private void ApplyRollingInput(Vector2 input)
+    {
+        Vector3 direction = new Vector3(input.x, 0f, input.y).normalized;
+        body.AddForce(direction * acceleration, ForceMode.Acceleration);
+
+        Vector3 horizontalVelocity = new Vector3(body.linearVelocity.x, 0f, body.linearVelocity.z);
+        if (horizontalVelocity.sqrMagnitude > maxSpeed * maxSpeed)
+        {
+            horizontalVelocity = horizontalVelocity.normalized * maxSpeed;
+            body.linearVelocity = new Vector3(horizontalVelocity.x, body.linearVelocity.y, horizontalVelocity.z);
+        }
+    }
+
+    private void OnGUI()
+    {
+        if (!hasSecondPlayer)
+            return;
+
+        const int panelWidth = 250;
+        const int panelHeight = 76;
+        GUI.Box(new Rect(16f, 16f, panelWidth, panelHeight), "BALL CONTROL");
+        GUI.Label(new Rect(30f, 39f, panelWidth - 28f, 20f),
+            "Active: Player " + (playerOneActive ? "1 (WASD)" : "2 (Arrow Keys)"));
+
+        string nextPlayer = playerOneActive ? "Player 2" : "Player 1";
+        if (GUI.Button(new Rect(30f, 59f, panelWidth - 28f, 26f), "Switch to " + nextPlayer + "  [Tab]"))
+            SetActivePlayer(!playerOneActive);
+
+    }
+
+    public static void SetActivePlayer(bool playerOne)
+    {
+        playerOneActive = playerOne;
     }
 }
