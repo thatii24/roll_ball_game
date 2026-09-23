@@ -42,10 +42,10 @@ public class Player2Controller : MonoBehaviour
             return;
 
         Vector2 input = Vector2.zero;
-        if (Keyboard.current.leftArrowKey.isPressed) input.x -= 1f;
-        if (Keyboard.current.rightArrowKey.isPressed) input.x += 1f;
-        if (Keyboard.current.downArrowKey.isPressed) input.y -= 1f;
-        if (Keyboard.current.upArrowKey.isPressed) input.y += 1f;
+        if (Keyboard.current.akey.isPressed) input.x -= 1f;
+        if (Keyboard.current.dkey.isPressed) input.x += 1f;
+        if (Keyboard.current.skey.isPressed) input.y -= 1f;
+        if (Keyboard.current.wkey.isPressed) input.y += 1f;
 
         Vector3 direction = new Vector3(input.x, 0f, input.y).normalized;
         body.AddForce(direction * acceleration, ForceMode.Acceleration);
