@@ -7,8 +7,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float acceleration = 24f;
     [SerializeField, Min(0f)] private float maxSpeed = 8.5f;
     [SerializeField, Min(0f)] private float rollingDrag = 1.25f;
+    [SerializeField] private float fallRespawnHeight = -4f;
 
     private Rigidbody body;
+    private Vector3 respawnPosition;
     private bool hasSecondPlayer;
     private static bool playerOneActive = true;
 
@@ -17,6 +19,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
+        respawnPosition = transform.position;
         playerOneActive = true;
         hasSecondPlayer = GameObject.Find("Player2") != null;
         ConfigureBody();
@@ -40,7 +43,19 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!playerOneActive || body == null || Keyboard.current == null)
+        if (body == null)
+            return;
+
+        if (body.position.y < fallRespawnHeight)
+        {
+            body.position = respawnPosition;
+            body.linearVelocity = Vector3.zero;
+            body.angularVelocity = Vector3.zero;
+            body.WakeUp();
+            return;
+        }
+
+        if (!playerOneActive || Keyboard.current == null)
             return;
 
         Vector2 input = Vector2.zero;
