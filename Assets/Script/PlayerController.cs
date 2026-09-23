@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float rollingDrag = 1.25f;
 
     private Rigidbody body;
+    private bool hasSecondPlayer;
     private static bool playerOneActive = true;
 
     public static bool PlayerOneActive => playerOneActive;
@@ -16,7 +17,15 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
+        playerOneActive = true;
+        hasSecondPlayer = GameObject.Find("Player2") != null;
         ConfigureBody();
+    }
+
+    private void Update()
+    {
+        if (hasSecondPlayer && Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
+            SetActivePlayer(!playerOneActive);
     }
 
     private void ConfigureBody()
@@ -58,7 +67,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnGUI()
     {
-        if (GameObject.Find("Player2") == null)
+        if (!hasSecondPlayer)
             return;
 
         const int panelWidth = 250;
@@ -71,8 +80,6 @@ public class PlayerController : MonoBehaviour
         if (GUI.Button(new Rect(30f, 59f, panelWidth - 28f, 26f), "Switch to " + nextPlayer + "  [Tab]"))
             SetActivePlayer(!playerOneActive);
 
-        if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
-            SetActivePlayer(!playerOneActive);
     }
 
     public static void SetActivePlayer(bool playerOne)

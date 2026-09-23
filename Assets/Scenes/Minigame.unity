@@ -634,7 +634,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b1ab9ce56321e9a42894617ca90e9216, type: 2}
+  - {fileID: 2100000, guid: aaf1943c3e2e4a93b33bb61f71a2dc98, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -696,6 +696,7 @@ GameObject:
   - component: {fileID: 1547984633}
   - component: {fileID: 1547984632}
   - component: {fileID: 1547984631}
+  - component: {fileID: 1547984634}
   m_Layer: 0
   m_Name: Player2
   m_TagString: Untagged
@@ -865,6 +866,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1547984634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547984626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f73bd54b5e144e9b24b05d85835e2af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
